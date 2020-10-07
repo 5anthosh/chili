@@ -4,10 +4,12 @@ import "fmt"
 
 // Token character
 const (
-	PlusChar        = '+'
-	MinusChar       = '-'
-	StarChar        = '*'
-	CommonSlashChar = '/'
+	PlusChar         = '+'
+	MinusChar        = '-'
+	StarChar         = '*'
+	CommonSlashChar  = '/'
+	OpenBracketChar  = '('
+	CloseBracketChar = ')'
 )
 
 // Type of token
@@ -17,14 +19,21 @@ const (
 	Star
 	CommonSlash
 	Number
+	OpenBracket
+	CloseBracket
+	EOF
 )
 
+//TokenVsTokenLiteral #
 var TokenVsTokenLiteral map[uint]string = map[uint]string{
-	Plus:        "Plus",
-	Minus:       "Minus",
-	Star:        "Star",
-	CommonSlash: "Common Slash",
-	Number:      "Number",
+	Plus:         "Plus",
+	Minus:        "Minus",
+	Star:         "Star",
+	CommonSlash:  "Common Slash",
+	Number:       "Number",
+	OpenBracket:  "Open Bracket",
+	CloseBracket: "Close Bracket",
+	EOF:          "EOF",
 }
 
 //Token character stream of expression is token into token

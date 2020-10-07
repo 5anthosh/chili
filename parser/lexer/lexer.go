@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"strconv"
-	"strings"
 
 	"github.com/5anthosh/eval/parser/token"
+	"github.com/shopspring/decimal"
 )
 
 const nullTerminater = '\000'
@@ -19,6 +18,7 @@ var ErrInvalidNumber = errors.New("Invalid number")
 //ErrEOF #
 var ErrEOF = errors.New("EOF")
 
+//Lexer struct
 type Lexer struct {
 	source  []byte
 	len     uint
@@ -28,32 +28,32 @@ type Lexer struct {
 	current uint
 }
 
-//Lexer creates new lexer
+//New  creates new lexer
 func New(reader io.ReadCloser) (*Lexer, error) {
 	source, err := ioutil.ReadAll(reader)
 	if err != nil {
 		return nil, err
 	}
-	return LexerFromBytes(source), err
+	return FromBytes(source), err
 }
 
-//LexerFromBytes #
-func LexerFromBytes(source []byte) *Lexer {
+//FromBytes #
+func FromBytes(source []byte) *Lexer {
 	lex := new(Lexer)
 	lex.source = source
 	lex.len = uint(len(source))
 	return lex
 }
 
-//LexerFromString #
-func LexerFromString(source string) *Lexer {
-	return LexerFromBytes([]byte(source))
+//FromString #
+func FromString(source string) *Lexer {
+	return FromBytes([]byte(source))
 }
 
 //Next token
 func (l *Lexer) Next() (*token.Token, error) {
 	if l.isEnd() {
-		return nil, ErrEOF
+		return l.nextToken(token.EOF, nil), nil
 	}
 	l.start = l.current
 	t, err := l.scan()
@@ -76,12 +76,18 @@ func (l *Lexer) scan() (*token.Token, error) {
 		return l.nextToken(token.Star, nil), nil
 	case token.CommonSlashChar:
 		return l.nextToken(token.CommonSlash, nil), nil
+	case token.OpenBracketChar:
+		return l.nextToken(token.OpenBracket, nil), nil
+	case token.CloseBracketChar:
+		return l.nextToken(token.CloseBracket, nil), nil
+	case nullTerminater:
+		return l.nextToken(token.EOF, nil), nil
 	}
 	if isDigit(b) {
 		return l.number()
 	}
 	//ErrUnexpectedToken #
-	var errUnexpectedToken = errors.New(fmt.Sprintf("Unexpected character %c", b))
+	var errUnexpectedToken = fmt.Errorf("Unexpected character %c", b)
 	return nil, errUnexpectedToken
 }
 
@@ -105,12 +111,8 @@ func (l *Lexer) number() (*token.Token, error) {
 		l.eat()
 		l.digits()
 	}
-	lexeme, err := strconv.ParseFloat(string(l.source[l.start:l.current]), 32)
-	if err != nil && !strings.Contains(err.Error(), "value out of range") {
-		return nil, ErrInvalidNumber
-	}
-
-	return l.nextToken(token.Number, lexeme), nil
+	value, err := decimal.NewFromString(string(l.source[l.start:l.current]))
+	return l.nextToken(token.Number, value), err
 }
 
 func (l *Lexer) eat() byte {

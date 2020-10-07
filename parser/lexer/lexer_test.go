@@ -9,7 +9,7 @@ import (
 
 func TestLexerNormalExpression(t *testing.T) {
 	expression := "34534 + 345.34 - 222 / 43435 * 745.234"
-	lex := LexerFromString(expression)
+	lex := FromString(expression)
 	tokens := []token.Token{
 		{Type: token.Number, Literal: float64(34534), Lexeme: "34534", Column: 5},
 		{Type: token.Plus, Literal: nil, Lexeme: "+", Column: 7},

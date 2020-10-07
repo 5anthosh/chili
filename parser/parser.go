@@ -108,6 +108,16 @@ func (p *Parser) term() (expr.Expr, error) {
 		numberExpression := p.previous()
 		return &expr.Literal{Value: numberExpression.Literal}, nil
 	}
+
+	ok, err = p.match([]uint{token.Variable})
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		variableExpression := p.previous()
+		return &expr.Variable{Name: variableExpression.Lexeme}, nil
+	}
+
 	ok, err = p.match([]uint{token.OpenBracket})
 	if err != nil {
 		return nil, err

@@ -73,6 +73,11 @@ func (ac *Printer) VisitUnaryExpr(unaryExpr *expr.Unary) (interface{}, error) {
 	return fmt.Sprintf("%s %s \n|\n%v", createPrefix(ac.depth, "UNARY"), token.TokenVsTokenLiteral[unaryExpr.Operator.Type], expression), nil
 }
 
+//VisitVariableExpr #
+func (ac *Printer) VisitVariableExpr(variableExpression *expr.Variable) (interface{}, error) {
+	return fmt.Sprintf("%s %s\n|\n", createPrefix(ac.depth, "VARIABLE"), variableExpression.Name), nil
+}
+
 func (ac *Printer) accept(expression expr.Expr) (interface{}, error) {
 	return expression.Accept(ac)
 }

@@ -3,19 +3,74 @@ package evaluator
 import (
 	"fmt"
 
+	"github.com/5anthosh/eval/evaluator/function"
 	"github.com/5anthosh/eval/parser/ast/expr"
 	"github.com/5anthosh/eval/parser/token"
 	"github.com/shopspring/decimal"
 )
 
+const (
+	functionType = 1 + iota
+	variableType
+)
+
 //Evaluator #
 type Evaluator struct {
-	AST expr.Expr
+	strict      bool
+	symbolTable map[string]uint
+	variables   map[string]interface{}
+	functions   map[string]function.Function
+}
+
+//New Evaluator
+func New(strict bool) *Evaluator {
+	return &Evaluator{
+		strict:      strict,
+		symbolTable: make(map[string]uint),
+		variables:   make(map[string]interface{}),
+		functions:   make(map[string]function.Function),
+	}
+}
+
+//SetFunction #
+func (eval *Evaluator) SetFunction(function function.Function) error {
+	if eval.checkSymbolTable(function.Name, functionType) {
+		return fmt.Errorf("%s() is already declared", function.Name)
+	}
+	eval.symbolTableEntry(function.Name, functionType)
+	eval.functions[function.Name] = function
+	return nil
+}
+
+//SetNumberVariable #
+func (eval *Evaluator) SetNumberVariable(name string, value decimal.Decimal) error {
+	if eval.checkSymbolTable(name, variableType) {
+		return fmt.Errorf("%s is already declared", name)
+	}
+	eval.symbolTableEntry(name, variableType)
+	eval.variables[name] = value
+	return nil
+}
+
+func (eval *Evaluator) symbolTableEntry(name string, symbolType uint) {
+	eval.symbolTable[name] = symbolType
+}
+
+func (eval *Evaluator) checkSymbolTable(name string, symbolType uint) bool {
+	t, ok := eval.symbolTable[name]
+	if !ok {
+		return ok
+	}
+
+	if t == symbolType || eval.strict && t != symbolType {
+		return true
+	}
+	return false
 }
 
 //Run the evaluator
-func (eval *Evaluator) Run() (interface{}, error) {
-	return eval.accept(eval.AST)
+func (eval *Evaluator) Run(AST expr.Expr) (interface{}, error) {
+	return eval.accept(AST)
 }
 
 //VisitBinaryExpr #
@@ -63,6 +118,15 @@ func (eval *Evaluator) VisitUnaryExpr(unaryExpr *expr.Unary) (interface{}, error
 		return (right.(decimal.Decimal)).Neg(), nil
 	}
 	return right, nil
+}
+
+//VisitVariableExpr #
+func (eval *Evaluator) VisitVariableExpr(variableExpr *expr.Variable) (interface{}, error) {
+	value, ok := eval.variables[variableExpr.Name]
+	if ok {
+		return value, nil
+	}
+	return nil, fmt.Errorf("Unknown variable %s", variableExpr.Name)
 }
 
 func (eval *Evaluator) accept(expr expr.Expr) (interface{}, error) {

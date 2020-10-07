@@ -21,6 +21,7 @@ const (
 	Number
 	OpenBracket
 	CloseBracket
+	Variable
 	EOF
 )
 
@@ -33,6 +34,7 @@ var TokenVsTokenLiteral map[uint]string = map[uint]string{
 	Number:       "Number",
 	OpenBracket:  "Open Bracket",
 	CloseBracket: "Close Bracket",
+	Variable:     "Variable",
 	EOF:          "EOF",
 }
 

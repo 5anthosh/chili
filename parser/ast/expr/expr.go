@@ -13,6 +13,7 @@ type Visitor interface {
 	VisitGroupExpr(groupExpression *Group) (interface{}, error)
 	VisitLiteralExpr(LiteralExpression *Literal) (interface{}, error)
 	VisitUnaryExpr(unaryExpr *Unary) (interface{}, error)
+	VisitVariableExpr(variableExpr *Variable) (interface{}, error)
 }
 
 //Binary #
@@ -56,4 +57,14 @@ type Unary struct {
 //Accept Unary expr
 func (u *Unary) Accept(visitor Visitor) (interface{}, error) {
 	return visitor.VisitUnaryExpr(u)
+}
+
+//Variable #
+type Variable struct {
+	Name string
+}
+
+//Accept variable expression
+func (v *Variable) Accept(visitor Visitor) (interface{}, error) {
+	return visitor.VisitVariableExpr(v)
 }

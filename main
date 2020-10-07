@@ -1,0 +1,42 @@
+package main
+
+import (
+	"fmt"
+	"log"
+
+	"github.com/5anthosh/eval/evaluator"
+	"github.com/5anthosh/eval/parser"
+	"github.com/5anthosh/eval/parser/ast"
+	"github.com/shopspring/decimal"
+)
+
+func main() {
+	expression := "radius * radius"
+	exprParser := parser.New(expression)
+	exprAST, err := exprParser.Parse()
+	if err != nil {
+		log.Fatal(err)
+	}
+	printer := &ast.Printer{}
+	astStruct, err := printer.Print(exprAST)
+	if err != nil {
+		log.Fatal(err)
+	}
+	println(astStruct)
+	val, err := decimal.NewFromString("100")
+	if err != nil {
+		log.Fatal(err)
+	}
+	eval := evaluator.New(false)
+	err = eval.SetNumberVariable("radius", val)
+	if err != nil {
+		log.Fatal(err)
+	}
+	finalV, err := eval.Run(exprAST)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	println(fmt.Sprintf("final %v", finalV))
+}

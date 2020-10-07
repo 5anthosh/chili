@@ -86,6 +86,10 @@ func (l *Lexer) scan() (*token.Token, error) {
 	if isDigit(b) {
 		return l.number()
 	}
+
+	if isChar(b) {
+		return l.variable()
+	}
 	//ErrUnexpectedToken #
 	var errUnexpectedToken = fmt.Errorf("Unexpected character %c", b)
 	return nil, errUnexpectedToken
@@ -113,6 +117,11 @@ func (l *Lexer) number() (*token.Token, error) {
 	}
 	value, err := decimal.NewFromString(string(l.source[l.start:l.current]))
 	return l.nextToken(token.Number, value), err
+}
+
+func (l *Lexer) variable() (*token.Token, error) {
+	l.characters()
+	return l.nextToken(token.Variable, nil), nil
 }
 
 func (l *Lexer) eat() byte {
@@ -166,6 +175,16 @@ func (l *Lexer) digits() {
 }
 func isDigit(b byte) bool {
 	return b >= '0' && b <= '9'
+}
+
+func isChar(b byte) bool {
+	return b >= 'a' && b <= 'z' || b >= 'A' && b <= 'Z'
+}
+
+func (l *Lexer) characters() {
+	for !l.isEnd() && isChar(l.peek(0)) || isDigit(l.peek(0)) {
+		l.eat()
+	}
 }
 
 func (l *Lexer) nextToken(tokenType uint, literal interface{}) *token.Token {

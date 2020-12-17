@@ -41,7 +41,7 @@ func (p *Parser) addition() (expr.Expr, error) {
 		return nil, err
 	}
 	for {
-		ok, err := p.match([]uint{token.Plus, token.Minus})
+		ok, err := p.match([]uint{token.PlusType, token.MinusType})
 		if err != nil {
 			return nil, err
 		}
@@ -65,7 +65,7 @@ func (p *Parser) multiply() (expr.Expr, error) {
 		return nil, err
 	}
 	for {
-		ok, err := p.match([]uint{token.Star, token.CommonSlash})
+		ok, err := p.match([]uint{token.StarType, token.CommonSlashType})
 		if err != nil {
 			return nil, err
 		}
@@ -84,7 +84,7 @@ func (p *Parser) multiply() (expr.Expr, error) {
 }
 
 func (p *Parser) unary() (expr.Expr, error) {
-	ok, err := p.match([]uint{token.Plus, token.Minus})
+	ok, err := p.match([]uint{token.PlusType, token.MinusType})
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func (p *Parser) unary() (expr.Expr, error) {
 }
 
 func (p *Parser) term() (expr.Expr, error) {
-	ok, err := p.match([]uint{token.Number})
+	ok, err := p.match([]uint{token.NumberType})
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +109,7 @@ func (p *Parser) term() (expr.Expr, error) {
 		return &expr.Literal{Value: numberExpression.Literal}, nil
 	}
 
-	ok, err = p.match([]uint{token.Variable})
+	ok, err = p.match([]uint{token.VariableType})
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +118,7 @@ func (p *Parser) term() (expr.Expr, error) {
 		return &expr.Variable{Name: variableExpression.Lexeme}, nil
 	}
 
-	ok, err = p.match([]uint{token.OpenBracket})
+	ok, err = p.match([]uint{token.OpenParenType})
 	if err != nil {
 		return nil, err
 	}
@@ -132,10 +132,10 @@ func (p *Parser) term() (expr.Expr, error) {
 		if err != nil {
 			return nil, err
 		}
-		if peekToken.Type != token.EOF {
+		if peekToken.Type.Type() != token.EOFType {
 			peekValue = peekToken.Lexeme
 		}
-		err = p.consume(token.CloseBracket, fmt.Sprintf("Expect ')' after expression but found %s", peekValue))
+		err = p.consume(token.CloseParenType, fmt.Sprintf("Expect ')' after expression but found %s", peekValue))
 		if err != nil {
 			return nil, err
 		}
@@ -146,7 +146,7 @@ func (p *Parser) term() (expr.Expr, error) {
 		return nil, err
 	}
 	peekValue := "EOF"
-	if t.Type != token.EOF {
+	if t.Type.Type() != token.EOFType {
 		peekValue = t.Lexeme
 	}
 	return nil, fmt.Errorf("Expect Expression but found %s", peekValue)
@@ -155,7 +155,7 @@ func (p *Parser) term() (expr.Expr, error) {
 func (p *Parser) getToken() (*token.Token, error) {
 	t, err := p.lex.Next()
 	if err == nil {
-		if t.Type != token.EOF {
+		if t.Type.Type() != token.EOFType {
 			p.tokens = append(p.tokens, t)
 		}
 		return t, nil
@@ -201,7 +201,7 @@ func (p *Parser) check(tokenType uint) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return t.Type == tokenType, nil
+	return t.Type.Type() == tokenType, nil
 }
 
 func (p *Parser) peek() (*token.Token, error) {
@@ -212,7 +212,7 @@ func (p *Parser) isAtEnd() (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return t.Type == token.EOF, nil
+	return t.Type.Type() == token.EOFType, nil
 }
 
 func (p *Parser) previous() *token.Token {

@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/5anthosh/eval/parser/ast/expr"
-	"github.com/5anthosh/eval/parser/token"
 )
 
 const (
@@ -43,7 +42,7 @@ func (ac *Printer) VisitBinaryExpr(binaryExpr *expr.Binary) (interface{}, error)
 		return nil, err
 	}
 	ac.depth -= tab
-	return fmt.Sprintf("%s %s \n|\n%v%v", createPrefix(ac.depth, "BINARY"), token.TokenVsTokenLiteral[binaryExpr.Operator.Type], left, right), nil
+	return fmt.Sprintf("%s %s \n|\n%v%v", createPrefix(ac.depth, "BINARY"), binaryExpr.Operator.Type.String(), left, right), nil
 }
 
 //VisitGroupExpr #
@@ -70,7 +69,7 @@ func (ac *Printer) VisitUnaryExpr(unaryExpr *expr.Unary) (interface{}, error) {
 		return nil, err
 	}
 	ac.depth -= tab
-	return fmt.Sprintf("%s %s \n|\n%v", createPrefix(ac.depth, "UNARY"), token.TokenVsTokenLiteral[unaryExpr.Operator.Type], expression), nil
+	return fmt.Sprintf("%s %s \n|\n%v", createPrefix(ac.depth, "UNARY"), unaryExpr.Operator.Type.String(), expression), nil
 }
 
 //VisitVariableExpr #

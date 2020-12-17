@@ -84,18 +84,18 @@ func (eval *Evaluator) VisitBinaryExpr(binaryExpr *expr.Binary) (interface{}, er
 		return nil, err
 	}
 
-	switch binaryExpr.Operator.Type {
-	case token.Plus:
+	switch binaryExpr.Operator.Type.Type() {
+	case token.PlusType:
 		return left.(decimal.Decimal).Add(right.(decimal.Decimal)), nil
-	case token.Minus:
+	case token.MinusType:
 		return left.(decimal.Decimal).Sub(right.(decimal.Decimal)), nil
-	case token.Star:
+	case token.StarType:
 		return left.(decimal.Decimal).Mul(right.(decimal.Decimal)), nil
-	case token.CommonSlash:
+	case token.CommonSlashType:
 		return left.(decimal.Decimal).Div(right.(decimal.Decimal)), nil
 	}
 
-	return nil, fmt.Errorf("Unexpected binary operator %s", token.TokenVsTokenLiteral[binaryExpr.Operator.Type])
+	return nil, fmt.Errorf("Unexpected binary operator %s", binaryExpr.Operator.Type.String())
 }
 
 //VisitGroupExpr #
@@ -114,7 +114,7 @@ func (eval *Evaluator) VisitUnaryExpr(unaryExpr *expr.Unary) (interface{}, error
 	if err != nil {
 		return nil, err
 	}
-	if unaryExpr.Operator.Type == token.Minus {
+	if unaryExpr.Operator.Type.Type() == token.MinusType {
 		return (right.(decimal.Decimal)).Neg(), nil
 	}
 	return right, nil

@@ -53,7 +53,7 @@ func FromString(source string) *Lexer {
 //Next token
 func (l *Lexer) Next() (*token.Token, error) {
 	if l.isEnd() {
-		return l.nextToken(token.EOF, nil), nil
+		return l.nextToken(token.EOF{}, nil), nil
 	}
 	l.start = l.current
 	t, err := l.scan()
@@ -69,19 +69,19 @@ func (l *Lexer) scan() (*token.Token, error) {
 	b = l.space(b)
 	switch b {
 	case token.PlusChar:
-		return l.nextToken(token.Plus, nil), nil
+		return l.nextToken(token.Plus{}, nil), nil
 	case token.MinusChar:
-		return l.nextToken(token.Minus, nil), nil
+		return l.nextToken(token.Minus{}, nil), nil
 	case token.StarChar:
-		return l.nextToken(token.Star, nil), nil
+		return l.nextToken(token.Star{}, nil), nil
 	case token.CommonSlashChar:
-		return l.nextToken(token.CommonSlash, nil), nil
-	case token.OpenBracketChar:
-		return l.nextToken(token.OpenBracket, nil), nil
-	case token.CloseBracketChar:
-		return l.nextToken(token.CloseBracket, nil), nil
+		return l.nextToken(token.CommonSlash{}, nil), nil
+	case token.OpenParenChar:
+		return l.nextToken(token.OpenParen{}, nil), nil
+	case token.CloseParenChar:
+		return l.nextToken(token.CloseParen{}, nil), nil
 	case nullTerminater:
-		return l.nextToken(token.EOF, nil), nil
+		return l.nextToken(token.EOF{}, nil), nil
 	}
 	if isDigit(b) {
 		return l.number()
@@ -116,12 +116,12 @@ func (l *Lexer) number() (*token.Token, error) {
 		l.digits()
 	}
 	value, err := decimal.NewFromString(string(l.source[l.start:l.current]))
-	return l.nextToken(token.Number, value), err
+	return l.nextToken(token.Number{}, value), err
 }
 
 func (l *Lexer) variable() (*token.Token, error) {
 	l.characters()
-	return l.nextToken(token.Variable, nil), nil
+	return l.nextToken(token.Variable{}, nil), nil
 }
 
 func (l *Lexer) eat() byte {
@@ -187,7 +187,7 @@ func (l *Lexer) characters() {
 	}
 }
 
-func (l *Lexer) nextToken(tokenType uint, literal interface{}) *token.Token {
+func (l *Lexer) nextToken(tokenType token.Type, literal interface{}) *token.Token {
 	return &token.Token{
 		Type:    tokenType,
 		Literal: literal,

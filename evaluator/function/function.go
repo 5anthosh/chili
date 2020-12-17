@@ -5,4 +5,6 @@ type Function struct {
 	Name         string
 	Arity        uint
 	FunctionImpl func(argument []interface{}) (interface{}, error)
+	ParamsType   []uint
 }
+

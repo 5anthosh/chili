@@ -9,63 +9,53 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-const (
-	functionType = 1 + iota
-	variableType
-)
-
 //Evaluator #
 type Evaluator struct {
-	strict      bool
-	symbolTable map[string]uint
+	symbolTable map[string]struct{}
 	variables   map[string]interface{}
 	functions   map[string]function.Function
 }
 
 //New Evaluator
-func New(strict bool) *Evaluator {
+func New() *Evaluator {
 	return &Evaluator{
-		strict:      strict,
-		symbolTable: make(map[string]uint),
+		symbolTable: make(map[string]struct{}),
 		variables:   make(map[string]interface{}),
 		functions:   make(map[string]function.Function),
 	}
 }
 
-//SetFunction #
+//SetFunction to Evaluator
 func (eval *Evaluator) SetFunction(function function.Function) error {
-	if eval.checkSymbolTable(function.Name, functionType) {
-		return fmt.Errorf("%s() is already declared", function.Name)
+	if eval.checkSymbolTable(function.Name) {
+		return fmt.Errorf("%s is already declared", function.Name)
 	}
-	eval.symbolTableEntry(function.Name, functionType)
+	eval.symbolTableEntry(function.Name)
 	eval.functions[function.Name] = function
 	return nil
 }
 
+func (eval *Evaluator) defaultFunctions() {
+	eval.SetFunction(function.AbsFunction)
+}
+
 //SetNumberVariable #
 func (eval *Evaluator) SetNumberVariable(name string, value decimal.Decimal) error {
-	if eval.checkSymbolTable(name, variableType) {
+	if eval.checkSymbolTable(name) {
 		return fmt.Errorf("%s is already declared", name)
 	}
-	eval.symbolTableEntry(name, variableType)
+	eval.symbolTableEntry(name)
 	eval.variables[name] = value
 	return nil
 }
 
-func (eval *Evaluator) symbolTableEntry(name string, symbolType uint) {
-	eval.symbolTable[name] = symbolType
+func (eval *Evaluator) symbolTableEntry(name string) {
+	eval.symbolTable[name] = struct{}{}
 }
 
-func (eval *Evaluator) checkSymbolTable(name string, symbolType uint) bool {
-	t, ok := eval.symbolTable[name]
-	if !ok {
-		return ok
-	}
-
-	if t == symbolType || eval.strict && t != symbolType {
-		return true
-	}
-	return false
+func (eval *Evaluator) checkSymbolTable(name string) bool {
+	_, ok := eval.symbolTable[name]
+	return ok
 }
 
 //Run the evaluator

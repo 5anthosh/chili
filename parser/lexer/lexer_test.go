@@ -1,7 +1,6 @@
 package lexer
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/5anthosh/eval/parser/token"
@@ -9,7 +8,7 @@ import (
 )
 
 func TestLexerNormalExpression(t *testing.T) {
-	expression := "34534 + 345.34 - 222 / 43435 * 745.234"
+	expression := "34534 + 345.34 - 222 / 43435 * 745.234 () ()"
 	lex := FromString(expression)
 	number1, _ := decimal.NewFromString("34534")
 	number2, _ := decimal.NewFromString("345.34")
@@ -27,6 +26,10 @@ func TestLexerNormalExpression(t *testing.T) {
 		{Type: token.Number{}, Literal: number4, Lexeme: "43435", Column: 28},
 		{Type: token.Star{}, Literal: nil, Lexeme: "*", Column: 30},
 		{Type: token.Number{}, Literal: number5, Lexeme: "745.234", Column: 38},
+		{Type: token.OpenParen{}, Literal: nil, Lexeme: "(", Column: 40},
+		{Type: token.CloseParen{}, Literal: nil, Lexeme: ")", Column: 41},
+		{Type: token.OpenParen{}, Literal: nil, Lexeme: "(", Column: 43},
+		{Type: token.CloseParen{}, Literal: nil, Lexeme: ")", Column: 44},
 	}
 	for _, tt := range tokens {
 		t.Run(tt.Lexeme, func(t *testing.T) {
@@ -35,9 +38,28 @@ func TestLexerNormalExpression(t *testing.T) {
 				t.Errorf("Lexer.Next() error = %v, wantErr %v", err, false)
 				return
 			}
-			if !reflect.DeepEqual(got, tt) {
-				t.Errorf("Lexer.Next() = %v, want %v", got, tt)
-			}
+			testLocalToken(t, tt, *got)
 		})
+	}
+}
+
+func testLocalToken(t *testing.T, tt token.Token, got token.Token) {
+	if tt.Column != got.Column {
+		t.Errorf("Lexer.Next().Column == %v, want %v", got.Column, tt.Column)
+	}
+
+	if tt.Type.Type() != got.Type.Type() {
+		t.Errorf("Lexer.Next().Type == %v, want %v", got.Type.String(), tt.Type.String())
+	}
+
+	switch tt.Literal.(type) {
+	case decimal.Decimal:
+		if !tt.Literal.(decimal.Decimal).Equal(got.Literal.(decimal.Decimal)) {
+			t.Errorf("Lexer.Next().Literal == %v, want %v", got.Literal, tt.Literal)
+		}
+	}
+
+	if tt.Lexeme != got.Lexeme {
+		t.Errorf("Lexer.Next().Lexeme == %v, want %v", got.Lexeme, tt.Lexeme)
 	}
 }

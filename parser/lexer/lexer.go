@@ -82,6 +82,12 @@ func (l *Lexer) scan() (*token.Token, error) {
 		return l.nextToken(token.CloseParen{}, nil), nil
 	case nullTerminater:
 		return l.nextToken(token.EOF{}, nil), nil
+	case token.CapChar:
+		return l.nextToken(token.Cap{}, nil), nil
+	case token.ModChar:
+		return l.nextToken(token.Mod{}, nil), nil
+	case token.CommaChar:
+		return l.nextToken(token.Comma{}, nil), nil
 	}
 	if isDigit(b) {
 		return l.number()
@@ -182,7 +188,7 @@ func isChar(b byte) bool {
 }
 
 func (l *Lexer) characters() {
-	for !l.isEnd() && isChar(l.peek(0)) || isDigit(l.peek(0)) {
+	for !l.isEnd() && isChar(l.peek(0)) || isDigit(l.peek(0)) || l.peek(0) == '_' {
 		l.eat()
 	}
 }

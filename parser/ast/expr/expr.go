@@ -14,6 +14,7 @@ type Visitor interface {
 	VisitLiteralExpr(LiteralExpression *Literal) (interface{}, error)
 	VisitUnaryExpr(unaryExpr *Unary) (interface{}, error)
 	VisitVariableExpr(variableExpr *Variable) (interface{}, error)
+	VisitFunctionCall(functionCallExpr *FunctionCall) (interface{}, error)
 }
 
 //Binary #
@@ -67,4 +68,15 @@ type Variable struct {
 //Accept variable expression
 func (v *Variable) Accept(visitor Visitor) (interface{}, error) {
 	return visitor.VisitVariableExpr(v)
+}
+
+//FunctionCall #
+type FunctionCall struct {
+	Name string
+	Args []Expr
+}
+
+//Accept #
+func (f *FunctionCall) Accept(visitor Visitor) (interface{}, error) {
+	return visitor.VisitFunctionCall(f)
 }

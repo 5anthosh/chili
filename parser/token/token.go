@@ -10,6 +10,9 @@ const (
 	CommonSlashChar = '/'
 	OpenParenChar   = '('
 	CloseParenChar  = ')'
+	CapChar         = '^'
+	ModChar         = '%'
+	CommaChar       = ','
 )
 
 // Type of tokens
@@ -22,6 +25,9 @@ const (
 	OpenParenType
 	CloseParenType
 	VariableType
+	CapType
+	ModType
+	CommaType
 	EOFType
 )
 
@@ -125,6 +131,42 @@ func (v Variable) String() string {
 //Type of symbol
 func (v Variable) Type() uint {
 	return VariableType
+}
+
+//Cap symbol
+type Cap struct{}
+
+func (c Cap) String() string {
+	return "Cap"
+}
+
+//Type of symbol
+func (c Cap) Type() uint {
+	return CapType
+}
+
+//Mod symbol
+type Mod struct{}
+
+func (m Mod) String() string {
+	return "Mod"
+}
+
+//Type of symbol
+func (m Mod) Type() uint {
+	return ModType
+}
+
+//Comma symbol
+type Comma struct{}
+
+func (c Comma) String() string {
+	return "Comma"
+}
+
+//Type of symbol
+func (c Comma) Type() uint {
+	return CommaType
 }
 
 //EOF symbol

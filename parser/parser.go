@@ -60,12 +60,36 @@ func (p *Parser) addition() (expr.Expr, error) {
 }
 
 func (p *Parser) multiply() (expr.Expr, error) {
+	expression, err := p.exponent()
+	if err != nil {
+		return nil, err
+	}
+	for {
+		ok, err := p.match([]uint{token.StarType, token.CommonSlashType, token.CapType, token.ModType})
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			operator := p.previous()
+			right, err := p.exponent()
+			if err != nil {
+				return nil, err
+			}
+			expression = &expr.Binary{Left: expression, Right: right, Operator: operator}
+			continue
+		}
+		break
+	}
+	return expression, nil
+}
+
+func (p *Parser) exponent() (expr.Expr, error) {
 	expression, err := p.unary()
 	if err != nil {
 		return nil, err
 	}
 	for {
-		ok, err := p.match([]uint{token.StarType, token.CommonSlashType})
+		ok, err := p.match([]uint{token.CapType})
 		if err != nil {
 			return nil, err
 		}
@@ -90,13 +114,61 @@ func (p *Parser) unary() (expr.Expr, error) {
 	}
 	if ok {
 		t := p.previous()
-		unaryExpr, err := p.unary()
+		unaryExpr, err := p.functionCall()
 		if err != nil {
 			return nil, err
 		}
 		return &expr.Unary{Operator: t, Right: unaryExpr}, nil
 	}
-	return p.term()
+	return p.functionCall()
+}
+
+func (p *Parser) functionCall() (expr.Expr, error) {
+	expression, err := p.term()
+	if err != nil {
+		return nil, err
+	}
+	ok, err := p.match([]uint{token.OpenParenType})
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		switch expression.(type) {
+		case *expr.Variable:
+			name := expression.(*expr.Variable).Name
+			var args []expr.Expr
+			ok, err := p.match([]uint{token.CloseParenType})
+			if err != nil {
+				return nil, err
+			}
+			if ok {
+				return &expr.FunctionCall{Name: name, Args: args}, nil
+			}
+			for {
+				arg, err := p.expression()
+				if err != nil {
+					return nil, err
+				}
+				args = append(args, arg)
+				ok, err := p.match([]uint{token.CommaType})
+				if err != nil {
+					return nil, err
+				}
+				if !ok {
+					break
+				}
+			}
+			ok, err = p.match([]uint{token.CloseParenType})
+			if err != nil {
+				return nil, err
+			}
+			if ok {
+				return &expr.FunctionCall{Name: name, Args: args}, nil
+			}
+			return nil, errors.New("Expecting ')' after arguments")
+		}
+	}
+	return expression, err
 }
 
 func (p *Parser) term() (expr.Expr, error) {

@@ -96,11 +96,45 @@ func (ac *Printer) VisitFunctionCall(functionCallExpr *expr.FunctionCall) (inter
 		if err != nil {
 			return nil, err
 		}
-		builder.WriteString(fmt.Sprintf("%s \n|\n", argStr))
+		builder.WriteString(fmt.Sprintf("%s", argStr))
 	}
 	ac.depth -= tab
 	return builder.String(), nil
 
+}
+
+//VisitTernary #
+func (ac *Printer) VisitTernary(ternaryExpr *expr.Ternary) (interface{}, error) {
+	ac.depth += tab
+	cond, err := ac.accept(ternaryExpr.Condition)
+	if err != nil {
+		return nil, err
+	}
+	trueExpr, err := ac.accept(ternaryExpr.True)
+	if err != nil {
+		return nil, err
+	}
+	falseExpr, err := ac.accept(ternaryExpr.False)
+	if err != nil {
+		return nil, err
+	}
+	ac.depth -= tab
+	return fmt.Sprintf("%s \n|\n %v%v%v", createPrefix(ac.depth, "TERNARY"), cond, trueExpr, falseExpr), nil
+}
+
+//VisitLogicalExpr #
+func (ac *Printer) VisitLogicalExpr(logicalExpr *expr.Logical) (interface{}, error) {
+	ac.depth += tab
+	left, err := ac.accept(logicalExpr.Left)
+	if err != nil {
+		return nil, err
+	}
+	right, err := ac.accept(logicalExpr.Right)
+	if err != nil {
+		return nil, err
+	}
+	ac.depth -= tab
+	return fmt.Sprintf("%s %s \n|\n%v%v", createPrefix(ac.depth, "LOGICAL"), logicalExpr.Operator.Type.String(), left, right), nil
 }
 
 func (ac *Printer) accept(expression expr.Expr) (interface{}, error) {

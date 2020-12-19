@@ -31,5 +31,8 @@ var (
 		Arity:        1,
 		FunctionImpl: absImpl,
 		ParamsType:   []uint{datatype.NumeberType},
+		VerifyArgs: func(arguments []interface{}) error {
+			return nil
+		},
 	}
 )

@@ -40,8 +40,9 @@ func (e *Environment) SetFunction(function function.Function) error {
 }
 
 //SetDefaultFunctions to environment
-func (e *Environment) SetDefaultFunctions() {
-	e.SetFunction(function.AbsFunction)
+func (e *Environment) SetDefaultFunctions() error {
+	err := e.SetFunction(function.AbsFunction)
+	return err
 }
 
 //SetNumberVariable in the environment
@@ -59,8 +60,8 @@ func (e *Environment) DeclareVariable(name string, value interface{}) error {
 	return nil
 }
 
-//GetVarible from the environment
-func (e *Environment) GetVarible(name string) (interface{}, bool) {
+//GetVariable from the environment
+func (e *Environment) GetVariable(name string) (interface{}, bool) {
 	value, ok := e.variables[name]
 	return value, ok
 }
@@ -81,8 +82,8 @@ func (e *Environment) CheckSymbolTable(name string) bool {
 	return ok
 }
 
-//IsVarible check if name is variable
-func (e *Environment) IsVarible(name string) bool {
+//IsVariable check if name is variable
+func (e *Environment) IsVariable(name string) bool {
 	varType, _ := e.symbolTable[name]
 	return varType == variableType
 }

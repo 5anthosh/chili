@@ -15,6 +15,8 @@ type Visitor interface {
 	VisitUnaryExpr(unaryExpr *Unary) (interface{}, error)
 	VisitVariableExpr(variableExpr *Variable) (interface{}, error)
 	VisitFunctionCall(functionCallExpr *FunctionCall) (interface{}, error)
+	VisitTernary(ternaryExpr *Ternary) (interface{}, error)
+	VisitLogicalExpr(logicalExpr *Logical) (interface{}, error)
 }
 
 //Binary #
@@ -79,4 +81,28 @@ type FunctionCall struct {
 //Accept #
 func (f *FunctionCall) Accept(visitor Visitor) (interface{}, error) {
 	return visitor.VisitFunctionCall(f)
+}
+
+//Ternary  #
+type Ternary struct {
+	Condition Expr
+	True      Expr
+	False     Expr
+}
+
+//Accept #
+func (t *Ternary) Accept(visitor Visitor) (interface{}, error) {
+	return visitor.VisitTernary(t)
+}
+
+//Logical operation
+type Logical struct {
+	Left     Expr
+	Right    Expr
+	Operator *token.Token
+}
+
+//Accept #
+func (t *Logical) Accept(visitor Visitor) (interface{}, error) {
+	return visitor.VisitLogicalExpr(t)
 }

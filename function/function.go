@@ -6,8 +6,9 @@ import "github.com/5anthosh/eval/evaluator/datatype"
 type Function struct {
 	Name         string
 	Arity        int
-	FunctionImpl func(argument []interface{}) (interface{}, error)
+	FunctionImpl func(args []interface{}) (interface{}, error)
 	ParamsType   []uint
+	VerifyArgs   func(arguments []interface{}) error
 }
 
 //CheckNumberOfArgs in the function

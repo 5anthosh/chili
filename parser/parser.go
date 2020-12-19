@@ -32,7 +32,89 @@ func (p *Parser) Parse() (expr.Expr, error) {
 }
 
 func (p *Parser) expression() (expr.Expr, error) {
-	return p.addition()
+	return p.ternary()
+}
+
+func (p *Parser) ternary() (expr.Expr, error) {
+	expression, err := p.logical()
+	if err != nil {
+		return nil, err
+	}
+	ok, err := p.match([]uint{token.QuestionType})
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return expression, nil
+	}
+	trueExpr, err := p.expression()
+	if err != nil {
+		return nil, err
+	}
+	ok, err = p.match([]uint{token.ColonType})
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, fmt.Errorf("Expecting : in ternary operation")
+	}
+	falseExpr, err := p.expression()
+	if err != nil {
+		return nil, err
+	}
+	return &expr.Ternary{
+		Condition: expression,
+		True:      trueExpr,
+		False:     falseExpr,
+	}, nil
+}
+
+func (p *Parser) logical() (expr.Expr, error) {
+	expression, err := p.equality()
+	if err != nil {
+		return nil, err
+	}
+	for {
+		ok, err := p.match([]uint{token.AndType, token.OrType})
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			operator := p.previous()
+			right, err := p.equality()
+			if err != nil {
+				return nil, err
+			}
+			expression = &expr.Logical{Left: expression, Right: right, Operator: operator}
+			continue
+		}
+		break
+	}
+	return expression, nil
+}
+
+func (p *Parser) equality() (expr.Expr, error) {
+	expression, err := p.addition()
+	if err != nil {
+		return nil, err
+	}
+	for {
+		ok, err := p.match([]uint{token.EqualType, token.NotEqualType})
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			operator := p.previous()
+			right, err := p.addition()
+			if err != nil {
+				return nil, err
+			}
+			expression = &expr.Binary{Left: expression, Right: right, Operator: operator}
+			continue
+		}
+		break
+	}
+	return expression, nil
 }
 
 func (p *Parser) addition() (expr.Expr, error) {
@@ -108,7 +190,7 @@ func (p *Parser) exponent() (expr.Expr, error) {
 }
 
 func (p *Parser) unary() (expr.Expr, error) {
-	ok, err := p.match([]uint{token.PlusType, token.MinusType})
+	ok, err := p.match([]uint{token.PlusType, token.MinusType, token.NotType})
 	if err != nil {
 		return nil, err
 	}
@@ -172,13 +254,13 @@ func (p *Parser) functionCall() (expr.Expr, error) {
 }
 
 func (p *Parser) term() (expr.Expr, error) {
-	ok, err := p.match([]uint{token.NumberType})
+	ok, err := p.match([]uint{token.NumberType, token.StringType, token.BooleanType})
 	if err != nil {
 		return nil, err
 	}
 	if ok {
-		numberExpression := p.previous()
-		return &expr.Literal{Value: numberExpression.Literal}, nil
+		literal := p.previous()
+		return &expr.Literal{Value: literal.Literal}, nil
 	}
 
 	ok, err = p.match([]uint{token.VariableType})

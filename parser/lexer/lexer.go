@@ -88,6 +88,38 @@ func (l *Lexer) scan() (*token.Token, error) {
 		return l.nextToken(token.Mod{}, nil), nil
 	case token.CommaChar:
 		return l.nextToken(token.Comma{}, nil), nil
+	case token.QuoteChar:
+		return l.stringLiteral(token.QuoteChar)
+	case token.DoubleQuoteChar:
+		return l.stringLiteral(token.DoubleQuoteChar)
+	case token.QuestionChar:
+		return l.nextToken(token.Question{}, nil), nil
+	case token.ColonChar:
+		return l.nextToken(token.Colon{}, nil), nil
+	case token.PipeChar:
+		if l.peek(0) == token.PipeChar {
+			l.eat()
+			return l.nextToken(token.Or{}, nil), nil
+		}
+		return nil, fmt.Errorf("Expecting '|' after |")
+	case token.AndChar:
+		if l.peek(0) == token.AndChar {
+			l.eat()
+			return l.nextToken(token.And{}, nil), nil
+		}
+		return nil, fmt.Errorf("Expecting '&' after &")
+	case token.EqualChar:
+		if l.peek(0) == token.EqualChar {
+			l.eat()
+			return l.nextToken(token.Equal{}, nil), nil
+		}
+		return nil, fmt.Errorf("Expecting '=' after =")
+	case token.PunctuationChar:
+		if l.peek(0) == token.EqualChar {
+			l.eat()
+			return l.nextToken(token.NotEqual{}, nil), nil
+		}
+		return l.nextToken(token.Not{}, nil), nil
 	}
 	if isDigit(b) {
 		return l.number()
@@ -127,6 +159,13 @@ func (l *Lexer) number() (*token.Token, error) {
 
 func (l *Lexer) variable() (*token.Token, error) {
 	l.characters()
+	value := l.source[int(l.start):int(l.current)]
+	if string(value) == "true" {
+		return l.nextToken(token.Boolean{}, true), nil
+	}
+	if string(value) == "false" {
+		return l.nextToken(token.Boolean{}, false), nil
+	}
 	return l.nextToken(token.Variable{}, nil), nil
 }
 
@@ -200,4 +239,18 @@ func (l *Lexer) nextToken(tokenType token.Type, literal interface{}) *token.Toke
 		Lexeme:  string(l.source[l.start:l.current]),
 		Column:  l.column,
 	}
+}
+
+func (l *Lexer) stringLiteral(s byte) (*token.Token, error) {
+	for {
+		if l.isEnd() {
+			return nil, fmt.Errorf("Expecting %c but found EOF", s)
+		}
+		if l.peek(0) == s {
+			l.eat()
+			break
+		}
+		l.eat()
+	}
+	return l.nextToken(token.LiteralString{}, string(l.source[l.start+1:l.current-1])), nil
 }

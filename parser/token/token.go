@@ -13,6 +13,14 @@ const (
 	CapChar         = '^'
 	ModChar         = '%'
 	CommaChar       = ','
+	QuoteChar       = '\''
+	DoubleQuoteChar = '"'
+	EqualChar       = '='
+	PunctuationChar = '!'
+	PipeChar        = '|'
+	AndChar         = '&'
+	QuestionChar    = '?'
+	ColonChar       = ':'
 )
 
 // Type of tokens
@@ -28,6 +36,15 @@ const (
 	CapType
 	ModType
 	CommaType
+	StringType
+	EqualType
+	NotEqualType
+	OrType
+	AndType
+	NotType
+	BooleanType
+	QuestionType
+	ColonType
 	EOFType
 )
 
@@ -40,133 +57,241 @@ type Type interface {
 //Plus symbol "+"
 type Plus struct{}
 
-func (p Plus) String() string {
+func (Plus) String() string {
 	return "Plus"
 }
 
 //Type of symbol
-func (p Plus) Type() uint {
+func (Plus) Type() uint {
 	return PlusType
 }
 
 //Star symbol "*"e
 type Star struct{}
 
-func (s Star) String() string {
+func (Star) String() string {
 	return "Star"
 }
 
 //Type of symbol
-func (s Star) Type() uint {
+func (Star) Type() uint {
 	return StarType
 }
 
 //Minus symbol "-"
 type Minus struct{}
 
-func (m Minus) String() string {
+func (Minus) String() string {
 	return "Minus"
 }
 
 //Type of symbol
-func (m Minus) Type() uint {
+func (Minus) Type() uint {
 	return MinusType
 }
 
 //CommonSlash symbol "/"
 type CommonSlash struct{}
 
-func (c CommonSlash) String() string {
+func (CommonSlash) String() string {
 	return "Common Slash"
 }
 
 //Type of symbol
-func (c CommonSlash) Type() uint {
+func (CommonSlash) Type() uint {
 	return CommonSlashType
 }
 
 //Number symbol
 type Number struct{}
 
-func (n Number) String() string {
+func (Number) String() string {
 	return "Number"
 }
 
 //Type of symbol
-func (n Number) Type() uint {
+func (Number) Type() uint {
 	return NumberType
 }
 
 //OpenParen symbol "("
 type OpenParen struct{}
 
-func (o OpenParen) String() string {
+func (OpenParen) String() string {
 	return "Open Bracket"
 }
 
 //Type of symbol
-func (o OpenParen) Type() uint {
+func (OpenParen) Type() uint {
 	return OpenParenType
 }
 
 //CloseParen symbol ")"
 type CloseParen struct{}
 
-func (c CloseParen) String() string {
+func (CloseParen) String() string {
 	return "Close Bracket"
 }
 
 //Type of symbol
-func (c CloseParen) Type() uint {
+func (CloseParen) Type() uint {
 	return CloseParenType
 }
 
 //Variable symbol
 type Variable struct{}
 
-func (v Variable) String() string {
+func (Variable) String() string {
 	return "Variable"
 }
 
 //Type of symbol
-func (v Variable) Type() uint {
+func (Variable) Type() uint {
 	return VariableType
 }
 
 //Cap symbol
 type Cap struct{}
 
-func (c Cap) String() string {
+func (Cap) String() string {
 	return "Cap"
 }
 
 //Type of symbol
-func (c Cap) Type() uint {
+func (Cap) Type() uint {
 	return CapType
 }
 
 //Mod symbol
 type Mod struct{}
 
-func (m Mod) String() string {
+func (Mod) String() string {
 	return "Mod"
 }
 
 //Type of symbol
-func (m Mod) Type() uint {
+func (Mod) Type() uint {
 	return ModType
 }
 
 //Comma symbol
 type Comma struct{}
 
-func (c Comma) String() string {
+func (Comma) String() string {
 	return "Comma"
 }
 
 //Type of symbol
-func (c Comma) Type() uint {
+func (Comma) Type() uint {
 	return CommaType
+}
+
+//LiteralString value
+type LiteralString struct{}
+
+func (LiteralString) String() string {
+	return "String"
+}
+
+//Type of symbol
+func (LiteralString) Type() uint {
+	return StringType
+}
+
+//Equal == symbol
+type Equal struct{}
+
+func (Equal) String() string {
+	return "Equal"
+}
+
+//Type of token
+func (Equal) Type() uint {
+	return EqualType
+}
+
+//NotEqual != symbol
+type NotEqual struct{}
+
+func (NotEqual) String() string {
+	return "Not Equal"
+}
+
+//Type of token
+func (NotEqual) Type() uint {
+	return NotEqualType
+}
+
+//And && symbol
+type And struct{}
+
+func (And) String() string {
+	return "And"
+}
+
+//Type of token
+func (And) Type() uint {
+	return AndType
+}
+
+//Or || symbol
+type Or struct{}
+
+func (Or) String() string {
+	return "Or"
+}
+
+//Type of token
+func (Or) Type() uint {
+	return OrType
+}
+
+//Boolean || symbol
+type Boolean struct{}
+
+func (Boolean) String() string {
+	return "Boolean"
+}
+
+//Type of token
+func (Boolean) Type() uint {
+	return BooleanType
+}
+
+//Question ? symbol
+type Question struct{}
+
+func (Question) String() string {
+	return "Question"
+}
+
+//Type of token
+func (Question) Type() uint {
+	return QuestionType
+}
+
+//Colon : symbol
+type Colon struct{}
+
+func (Colon) String() string {
+	return "Colon"
+}
+
+//Type of token
+func (Colon) Type() uint {
+	return ColonType
+}
+
+//Not ! symbol
+type Not struct{}
+
+func (Not) String() string {
+	return "Not"
+}
+
+//Type of token
+func (Not) Type() uint {
+	return NotType
 }
 
 //EOF symbol

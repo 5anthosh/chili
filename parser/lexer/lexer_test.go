@@ -8,14 +8,15 @@ import (
 )
 
 func TestLexerNormalExpression(t *testing.T) {
-	expression := "34534 + 345.34 - 222 / 43435 * 745.234 () ()"
+	expression := "34534 + 345.34 - 222 / 43435 * 745.234 () () '3453453' \"apple is good$\" sum(8E-3,097e+34)"
 	lex := FromString(expression)
 	number1, _ := decimal.NewFromString("34534")
 	number2, _ := decimal.NewFromString("345.34")
 	number3, _ := decimal.NewFromString("222")
 	number4, _ := decimal.NewFromString("43435")
 	number5, _ := decimal.NewFromString("745.234")
-
+	number6, _ := decimal.NewFromString("8E-3")
+	number7, _ := decimal.NewFromString("097e+34")
 	tokens := []token.Token{
 		{Type: token.Number{}, Literal: number1, Lexeme: "34534", Column: 5},
 		{Type: token.Plus{}, Literal: nil, Lexeme: "+", Column: 7},
@@ -30,6 +31,14 @@ func TestLexerNormalExpression(t *testing.T) {
 		{Type: token.CloseParen{}, Literal: nil, Lexeme: ")", Column: 41},
 		{Type: token.OpenParen{}, Literal: nil, Lexeme: "(", Column: 43},
 		{Type: token.CloseParen{}, Literal: nil, Lexeme: ")", Column: 44},
+		{Type: token.LiteralString{}, Literal: "3453453", Lexeme: "'3453453'", Column: 54},
+		{Type: token.LiteralString{}, Literal: "apple is good$", Lexeme: "\"apple is good$\"", Column: 71},
+		{Type: token.Variable{}, Literal: nil, Lexeme: "sum", Column: 75},
+		{Type: token.OpenParen{}, Literal: nil, Lexeme: "(", Column: 76},
+		{Type: token.Number{}, Literal: number6, Lexeme: "8E-3", Column: 80},
+		{Type: token.Comma{}, Literal: nil, Lexeme: ",", Column: 81},
+		{Type: token.Number{}, Literal: number7, Lexeme: "097e+34", Column: 88},
+		{Type: token.CloseParen{}, Literal: nil, Lexeme: ")", Column: 89},
 	}
 	for _, tt := range tokens {
 		t.Run(tt.Lexeme, func(t *testing.T) {

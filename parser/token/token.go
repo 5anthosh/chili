@@ -21,6 +21,8 @@ const (
 	AndChar         = '&'
 	QuestionChar    = '?'
 	ColonChar       = ':'
+	GreaterChar     = '>'
+	LesserChar      = '<'
 )
 
 // Type of tokens
@@ -39,6 +41,10 @@ const (
 	StringType
 	EqualType
 	NotEqualType
+	GreaterType
+	GreaterEqualType
+	LesserType
+	LesserEqualType
 	OrType
 	AndType
 	NotType
@@ -292,6 +298,54 @@ func (Not) String() string {
 //Type of token
 func (Not) Type() uint {
 	return NotType
+}
+
+//Greater ! symbol
+type Greater struct{}
+
+func (Greater) String() string {
+	return "Greater"
+}
+
+//Type of token
+func (Greater) Type() uint {
+	return GreaterType
+}
+
+//GreaterEqual ! symbol
+type GreaterEqual struct{}
+
+func (GreaterEqual) String() string {
+	return "GreaterEqual"
+}
+
+//Type of token
+func (GreaterEqual) Type() uint {
+	return GreaterEqualType
+}
+
+//Lesser ! symbol
+type Lesser struct{}
+
+func (Lesser) String() string {
+	return "Lesser"
+}
+
+//Type of token
+func (Lesser) Type() uint {
+	return LesserType
+}
+
+//LesserEqual ! symbol
+type LesserEqual struct{}
+
+func (LesserEqual) String() string {
+	return "LesserEqual"
+}
+
+//Type of token
+func (LesserEqual) Type() uint {
+	return LesserEqualType
 }
 
 //EOF symbol

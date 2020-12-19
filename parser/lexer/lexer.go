@@ -6,7 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/5anthosh/eval/parser/token"
+	"github.com/5anthosh/chili/parser/token"
 	"github.com/shopspring/decimal"
 )
 
@@ -120,6 +120,18 @@ func (l *Lexer) scan() (*token.Token, error) {
 			return l.nextToken(token.NotEqual{}, nil), nil
 		}
 		return l.nextToken(token.Not{}, nil), nil
+	case token.GreaterChar:
+		if l.peek(0) == token.EqualChar {
+			l.eat()
+			return l.nextToken(token.GreaterEqual{}, nil), nil
+		}
+		return l.nextToken(token.Greater{}, nil), nil
+	case token.LesserChar:
+		if l.peek(0) == token.EqualChar {
+			l.eat()
+			return l.nextToken(token.LesserEqual{}, nil), nil
+		}
+		return l.nextToken(token.LesserEqual{}, nil), nil
 	}
 	if isDigit(b) {
 		return l.number()

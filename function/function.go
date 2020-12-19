@@ -1,6 +1,6 @@
 package function
 
-import "github.com/5anthosh/eval/evaluator/datatype"
+import "github.com/5anthosh/chili/evaluator/datatype"
 
 //Function struct
 type Function struct {

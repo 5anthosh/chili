@@ -1,15 +1,15 @@
-package eval
+package chili
 
 import (
-	"github.com/5anthosh/eval/environment"
-	"github.com/5anthosh/eval/evaluator"
-	"github.com/5anthosh/eval/evaluator/datatype"
-	"github.com/5anthosh/eval/parser"
+	"github.com/5anthosh/chili/environment"
+	"github.com/5anthosh/chili/evaluator"
+	"github.com/5anthosh/chili/evaluator/datatype"
+	"github.com/5anthosh/chili/parser"
 	"github.com/shopspring/decimal"
 )
 
-//Run the expression
-func Run(expression string, data map[string]interface{}) (interface{}, error) {
+//Eval the expression
+func Eval(expression string, data map[string]interface{}) (interface{}, error) {
 	env := environment.New()
 	env.SetDefaultFunctions()
 	putDataToEnv(env, data)
@@ -18,8 +18,8 @@ func Run(expression string, data map[string]interface{}) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	_evaluator := evaluator.New(env, ast)
-	return _evaluator.Run()
+	_evaluator := evaluator.New(env)
+	return _evaluator.Run(ast)
 }
 
 func putDataToEnv(env *environment.Environment, data map[string]interface{}) error {

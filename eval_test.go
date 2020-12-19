@@ -1,12 +1,12 @@
-package eval
+package chili
 
 import (
 	"fmt"
 	"testing"
 
-	"github.com/5anthosh/eval/environment"
-	"github.com/5anthosh/eval/evaluator"
-	"github.com/5anthosh/eval/parser"
+	"github.com/5anthosh/chili/environment"
+	"github.com/5anthosh/chili/evaluator"
+	"github.com/5anthosh/chili/parser"
 	"github.com/shopspring/decimal"
 )
 
@@ -14,19 +14,19 @@ func TestEvalNumberFunction(t *testing.T) {
 	source := "PI*R^2 + abs(45.345)"
 	env := environment.New()
 	env.SetDefaultFunctions()
-	env.SetNumberVariable("PI", decimal.RequireFromString("3.14"))
+	env.SetNumberVariable("PI", decimal.RequireFromString("3.1415926535897932385"))
 	env.SetNumberVariable("R", decimal.RequireFromString("2"))
-	_parser := parser.New(source)
-	_ast, err := _parser.Parse()
+	chiliParser := parser.New(source)
+	expression, err := chiliParser.Parse()
 	if err != nil {
 		t.Error(err)
 	}
-	_evaluator := evaluator.New(env, _ast)
-	value, err := _evaluator.Run()
+	chiliEvaluator := evaluator.New(env)
+	value, err := chiliEvaluator.Run(expression)
 	if err != nil {
 		t.Error(err)
 	}
-	if fmt.Sprintf("%v", value) != "57.905" {
+	if fmt.Sprintf("%v", value) != "57.911370614359172954" {
 		t.Errorf("Evaluation = %s but want %s", fmt.Sprintf("%v", value), "57.905")
 	}
 }

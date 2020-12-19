@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/5anthosh/eval/parser/ast/expr"
-	"github.com/5anthosh/eval/parser/lexer"
-	"github.com/5anthosh/eval/parser/token"
+	"github.com/5anthosh/chili/parser/ast/expr"
+	"github.com/5anthosh/chili/parser/lexer"
+	"github.com/5anthosh/chili/parser/token"
 )
 
 //Parser struct
@@ -99,7 +99,14 @@ func (p *Parser) equality() (expr.Expr, error) {
 		return nil, err
 	}
 	for {
-		ok, err := p.match([]uint{token.EqualType, token.NotEqualType})
+		ok, err := p.match([]uint{
+			token.EqualType,
+			token.NotEqualType,
+			token.GreaterType,
+			token.GreaterEqualType,
+			token.LesserType,
+			token.LesserEqualType,
+		})
 		if err != nil {
 			return nil, err
 		}

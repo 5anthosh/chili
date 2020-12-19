@@ -1,6 +1,6 @@
 package expr
 
-import "github.com/5anthosh/eval/parser/token"
+import "github.com/5anthosh/chili/parser/token"
 
 //Expr interface
 type Expr interface {

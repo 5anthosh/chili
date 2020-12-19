@@ -1,4 +1,4 @@
-module github.com/5anthosh/eval
+module github.com/5anthosh/chili
 
 go 1.15
 

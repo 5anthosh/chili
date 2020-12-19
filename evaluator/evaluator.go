@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/5anthosh/eval/environment"
-	"github.com/5anthosh/eval/evaluator/datatype"
-	"github.com/5anthosh/eval/parser/ast/expr"
-	"github.com/5anthosh/eval/parser/token"
+	"github.com/5anthosh/chili/environment"
+	"github.com/5anthosh/chili/evaluator/datatype"
+	"github.com/5anthosh/chili/parser/ast/expr"
+	"github.com/5anthosh/chili/parser/token"
 	"github.com/shopspring/decimal"
 )
 
@@ -19,23 +19,21 @@ var (
 //Evaluator #
 type Evaluator struct {
 	Env *environment.Environment
-	AST expr.Expr
 }
 
 //New Evaluator
-func New(env *environment.Environment, AST expr.Expr) *Evaluator {
+func New(env *environment.Environment) *Evaluator {
 	if env == nil {
 		env = environment.New()
 	}
 	return &Evaluator{
 		Env: env,
-		AST: AST,
 	}
 }
 
 //Run the evaluator
-func (eval *Evaluator) Run() (interface{}, error) {
-	return eval.accept(eval.AST)
+func (eval *Evaluator) Run(expression expr.Expr) (interface{}, error) {
+	return eval.accept(expression)
 }
 
 //VisitBinaryExpr #
@@ -100,7 +98,26 @@ func (eval *Evaluator) VisitBinaryExpr(binaryExpr *expr.Binary) (interface{}, er
 			return nil, err
 		}
 		return !value, nil
-
+	case token.GreaterType:
+		if datatype.CheckNumber(left, right) {
+			return left.(decimal.Decimal).GreaterThan(right.(decimal.Decimal)), nil
+		}
+		return nil, generateUnsupportedOperationErr(">", left, right)
+	case token.GreaterEqualType:
+		if datatype.CheckNumber(left, right) {
+			return left.(decimal.Decimal).GreaterThanOrEqual(right.(decimal.Decimal)), nil
+		}
+		return nil, generateUnsupportedOperationErr(">=", left, right)
+	case token.LesserType:
+		if datatype.CheckNumber(left, right) {
+			return left.(decimal.Decimal).LessThan(right.(decimal.Decimal)), nil
+		}
+		return nil, generateUnsupportedOperationErr("<", left, right)
+	case token.LesserEqualType:
+		if datatype.CheckNumber(left, right) {
+			return left.(decimal.Decimal).LessThanOrEqual(right.(decimal.Decimal)), nil
+		}
+		return nil, generateUnsupportedOperationErr("<=", left, right)
 	}
 
 	return nil, fmt.Errorf("Unexpected binary operator %s", binaryExpr.Operator.Type.String())

@@ -3,7 +3,7 @@ package function
 import (
 	"fmt"
 
-	"github.com/5anthosh/eval/evaluator/datatype"
+	"github.com/5anthosh/chili/evaluator/datatype"
 	"github.com/shopspring/decimal"
 )
 

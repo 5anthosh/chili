@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/5anthosh/eval/parser/ast/expr"
+	"github.com/5anthosh/chili/parser/ast/expr"
 )
 
 const (

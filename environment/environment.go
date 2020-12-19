@@ -3,7 +3,7 @@ package environment
 import (
 	"fmt"
 
-	"github.com/5anthosh/eval/function"
+	"github.com/5anthosh/chili/function"
 	"github.com/shopspring/decimal"
 )
 

@@ -3,7 +3,7 @@ package environment
 import (
 	"testing"
 
-	"github.com/5anthosh/eval/function"
+	"github.com/5anthosh/chili/function"
 )
 
 type fields struct {

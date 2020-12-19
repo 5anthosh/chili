@@ -3,7 +3,7 @@ package lexer
 import (
 	"testing"
 
-	"github.com/5anthosh/eval/parser/token"
+	"github.com/5anthosh/chili/parser/token"
 	"github.com/shopspring/decimal"
 )
 

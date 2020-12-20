@@ -43,33 +43,32 @@ func main() {
 package main
 
 import (
-	"fmt"
-    
-	"github.com/5anthosh/chili/environment"
-	"github.com/5anthosh/chili/evaluator"
-	"github.com/5anthosh/chili/parser"
-	"github.com/shopspring/decimal"
+    "fmt"
+    "github.com/5anthosh/chili/environment"
+    "github.com/5anthosh/chili/evaluator"
+    "github.com/5anthosh/chili/parser"
+    "github.com/shopspring/decimal"
 )
 
 func main() {
-	source := "PI*R^2 + abs(45.345)"
+    source := "PI*R^2 + abs(45.345)"
     
-	env := environment.New()
-	env.SetDefaultFunctions()
-	env.SetNumberVariable("PI", decimal.RequireFromString("3.1415926535897932385"))
-	env.SetNumberVariable("R", decimal.RequireFromString("2"))
+    env := environment.New()
+    env.SetDefaultFunctions()
+    env.SetNumberVariable("PI", decimal.RequireFromString("3.1415926535897932385"))
+    env.SetNumberVariable("R", decimal.RequireFromString("2"))
     
-	chiliParser := parser.New(source)
-	expression, err := chiliParser.Parse()
-	if err != nil {
+    chiliParser := parser.New(source)
+    expression, err := chiliParser.Parse()
+    if err != nil {
         panic(err)
-	}
+    }
     
-	chiliEvaluator := evaluator.New(env)
-	value, err := chiliEvaluator.Run(expression)
-	if err != nil {
+    chiliEvaluator := evaluator.New(env)
+    value, err := chiliEvaluator.Run(expression)
+    if err != nil {
         panic(err)
-	}
+    }
     
     println(fmt.Sprintf("%v result", value))
 }

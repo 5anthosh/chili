@@ -20,9 +20,13 @@ var ErrEOF = errors.New("EOF")
 
 //Lexer struct
 type Lexer struct {
-	source  []byte
-	len     uint
-	tokens  []token.Token
+	// expression source
+	source []byte
+	// Length of expression source
+	len uint
+	// Scanned tokens
+	tokens []token.Token
+	// Current column
 	column  uint
 	start   uint
 	current uint
@@ -239,7 +243,7 @@ func isChar(b byte) bool {
 }
 
 func (l *Lexer) characters() {
-	for !l.isEnd() && isChar(l.peek(0)) || isDigit(l.peek(0)) || l.peek(0) == '_' {
+	for !l.isEnd() && (isChar(l.peek(0)) || isDigit(l.peek(0)) || l.peek(0) == '_' || l.peek(0) == '.') {
 		l.eat()
 	}
 }

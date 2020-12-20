@@ -76,7 +76,7 @@ func (e *Environment) symbolTableEntry(name string, varType uint) {
 	e.symbolTable[name] = varType
 }
 
-//CheckSymbolTable if variable is registed in symbol table
+//CheckSymbolTable if variable is registered in symbol table
 func (e *Environment) CheckSymbolTable(name string) bool {
 	_, ok := e.symbolTable[name]
 	return ok

@@ -47,6 +47,7 @@ func (p *Parser) ternary() (expr.Expr, error) {
 	if !ok {
 		return expression, nil
 	}
+
 	trueExpr, err := p.expression()
 	if err != nil {
 		return nil, err
@@ -79,16 +80,16 @@ func (p *Parser) logical() (expr.Expr, error) {
 		if err != nil {
 			return nil, err
 		}
-		if ok {
-			operator := p.previous()
-			right, err := p.equality()
-			if err != nil {
-				return nil, err
-			}
-			expression = &expr.Logical{Left: expression, Right: right, Operator: operator}
-			continue
+		if !ok {
+			break
 		}
-		break
+
+		operator := p.previous()
+		right, err := p.equality()
+		if err != nil {
+			return nil, err
+		}
+		expression = &expr.Logical{Left: expression, Right: right, Operator: operator}
 	}
 	return expression, nil
 }
@@ -110,16 +111,16 @@ func (p *Parser) equality() (expr.Expr, error) {
 		if err != nil {
 			return nil, err
 		}
-		if ok {
-			operator := p.previous()
-			right, err := p.addition()
-			if err != nil {
-				return nil, err
-			}
-			expression = &expr.Binary{Left: expression, Right: right, Operator: operator}
-			continue
+		if !ok {
+			break
 		}
-		break
+
+		operator := p.previous()
+		right, err := p.addition()
+		if err != nil {
+			return nil, err
+		}
+		expression = &expr.Binary{Left: expression, Right: right, Operator: operator}
 	}
 	return expression, nil
 }
@@ -134,16 +135,16 @@ func (p *Parser) addition() (expr.Expr, error) {
 		if err != nil {
 			return nil, err
 		}
-		if ok {
-			operator := p.previous()
-			right, err := p.multiply()
-			if err != nil {
-				return nil, err
-			}
-			expression = &expr.Binary{Left: expression, Right: right, Operator: operator}
-			continue
+		if !ok {
+			break
 		}
-		break
+
+		operator := p.previous()
+		right, err := p.multiply()
+		if err != nil {
+			return nil, err
+		}
+		expression = &expr.Binary{Left: expression, Right: right, Operator: operator}
 	}
 	return expression, nil
 }
@@ -158,16 +159,16 @@ func (p *Parser) multiply() (expr.Expr, error) {
 		if err != nil {
 			return nil, err
 		}
-		if ok {
-			operator := p.previous()
-			right, err := p.exponent()
-			if err != nil {
-				return nil, err
-			}
-			expression = &expr.Binary{Left: expression, Right: right, Operator: operator}
-			continue
+		if !ok {
+			break
 		}
-		break
+
+		operator := p.previous()
+		right, err := p.exponent()
+		if err != nil {
+			return nil, err
+		}
+		expression = &expr.Binary{Left: expression, Right: right, Operator: operator}
 	}
 	return expression, nil
 }
@@ -182,16 +183,15 @@ func (p *Parser) exponent() (expr.Expr, error) {
 		if err != nil {
 			return nil, err
 		}
-		if ok {
-			operator := p.previous()
-			right, err := p.unary()
-			if err != nil {
-				return nil, err
-			}
-			expression = &expr.Binary{Left: expression, Right: right, Operator: operator}
-			continue
+		if !ok {
+			break
 		}
-		break
+		operator := p.previous()
+		right, err := p.unary()
+		if err != nil {
+			return nil, err
+		}
+		expression = &expr.Binary{Left: expression, Right: right, Operator: operator}
 	}
 	return expression, nil
 }
@@ -201,15 +201,17 @@ func (p *Parser) unary() (expr.Expr, error) {
 	if err != nil {
 		return nil, err
 	}
-	if ok {
-		t := p.previous()
-		unaryExpr, err := p.functionCall()
-		if err != nil {
-			return nil, err
-		}
-		return &expr.Unary{Operator: t, Right: unaryExpr}, nil
+	if !ok {
+		return p.functionCall()
 	}
-	return p.functionCall()
+
+	t := p.previous()
+	unaryExpr, err := p.functionCall()
+	if err != nil {
+		return nil, err
+	}
+	return &expr.Unary{Operator: t, Right: unaryExpr}, nil
+
 }
 
 func (p *Parser) functionCall() (expr.Expr, error) {
@@ -221,43 +223,44 @@ func (p *Parser) functionCall() (expr.Expr, error) {
 	if err != nil {
 		return nil, err
 	}
-	if ok {
-		switch expression.(type) {
-		case *expr.Variable:
-			name := expression.(*expr.Variable).Name
-			var args []expr.Expr
-			ok, err := p.match([]uint{token.CloseParenType})
-			if err != nil {
-				return nil, err
-			}
-			if ok {
-				return &expr.FunctionCall{Name: name, Args: args}, nil
-			}
-			for {
-				arg, err := p.expression()
-				if err != nil {
-					return nil, err
-				}
-				args = append(args, arg)
-				ok, err := p.match([]uint{token.CommaType})
-				if err != nil {
-					return nil, err
-				}
-				if !ok {
-					break
-				}
-			}
-			ok, err = p.match([]uint{token.CloseParenType})
-			if err != nil {
-				return nil, err
-			}
-			if ok {
-				return &expr.FunctionCall{Name: name, Args: args}, nil
-			}
-			return nil, errors.New("Expecting ')' after arguments")
-		}
+	if !ok {
+		return expression, nil
 	}
-	return expression, err
+	switch expression.(type) {
+	case *expr.Variable:
+		name := expression.(*expr.Variable).Name
+		var args []expr.Expr
+		ok, err := p.match([]uint{token.CloseParenType})
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			return &expr.FunctionCall{Name: name, Args: args}, nil
+		}
+		for {
+			arg, err := p.expression()
+			if err != nil {
+				return nil, err
+			}
+			args = append(args, arg)
+			ok, err := p.match([]uint{token.CommaType})
+			if err != nil {
+				return nil, err
+			}
+			if !ok {
+				break
+			}
+		}
+		ok, err = p.match([]uint{token.CloseParenType})
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			return &expr.FunctionCall{Name: name, Args: args}, nil
+		}
+		return nil, errors.New("Expecting ')' after arguments")
+	}
+	return nil, errors.New("Expecting function before '('")
 }
 
 func (p *Parser) term() (expr.Expr, error) {

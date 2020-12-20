@@ -156,14 +156,17 @@ func (eval *Evaluator) VisitVariableExpr(variableExpr *expr.Variable) (interface
 	if !ok {
 		return nil, fmt.Errorf("Unknown variable %s", variableExpr.Name)
 	}
+
 	ok = eval.Env.IsVariable(variableExpr.Name)
 	if !ok {
 		return nil, fmt.Errorf("%s is not variable", variableExpr.Name)
 	}
+
 	value, ok := eval.Env.GetVariable(variableExpr.Name)
 	if ok {
 		return value, nil
 	}
+	
 	return nil, fmt.Errorf("Unknown variable %s", variableExpr.Name)
 }
 
@@ -173,6 +176,7 @@ func (eval *Evaluator) VisitFunctionCall(functionCall *expr.FunctionCall) (inter
 	if !ok {
 		return nil, fmt.Errorf("Unknown function %s()", functionCall.Name)
 	}
+
 	ok = eval.Env.IsFunction(functionCall.Name)
 	if !ok {
 		return nil, fmt.Errorf("%s is not function", functionCall.Name)
@@ -187,10 +191,12 @@ func (eval *Evaluator) VisitFunctionCall(functionCall *expr.FunctionCall) (inter
 		}
 		args = append(args, value)
 	}
+
 	ok = _function.CheckNumberOfArgs(args)
 	if !ok {
 		return nil, fmt.Errorf("function %s() expecting %d but got %d", functionCall.Name, _function.Arity, len(args))
 	}
+
 	ok = _function.CheckTypeOfArgs(args)
 	if !ok {
 		return nil, fmt.Errorf("function %s() got wrong data type params", functionCall.Name)
@@ -200,6 +206,7 @@ func (eval *Evaluator) VisitFunctionCall(functionCall *expr.FunctionCall) (inter
 	if err != nil {
 		return nil, err
 	}
+
 	return _function.FunctionImpl(args)
 }
 
@@ -259,7 +266,7 @@ func truthFullness(value interface{}) bool {
 		return false
 	}
 	if datatype.CheckNumber(value) && value.(decimal.Decimal).Equals(decimal.Zero) {
-		return true
+		return false
 	}
 	if datatype.CheckString(value) && len(value.(string)) == 0 {
 		return false

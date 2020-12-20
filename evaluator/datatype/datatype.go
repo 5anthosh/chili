@@ -8,10 +8,11 @@ import (
 
 //datatypes
 const (
-	NumeberType = 1 + iota
+	NumberType = 1 + iota
 	StringType
 	BooleanType
 	GenerictType
+	NoneType
 	UnSupportedType
 )
 
@@ -19,7 +20,7 @@ const (
 var ErrUnknownDataype = errors.New("unknown datatype")
 
 var typeVsString = []string{
-	"NUMBER", "STRING", "BOOLEAN", "GENERIC", "UNSUPPORTED",
+	"NUMBER", "STRING", "BOOLEAN", "GENERIC", "NONE", "UNSUPPORTED",
 }
 
 //Checkdatatype of value is correct
@@ -37,17 +38,17 @@ func IsSupported(value interface{}) bool {
 	return ok
 }
 
-//CheckNumber #
+//CheckNumber checks whether values are number type
 func CheckNumber(values ...interface{}) bool {
 	for _, value := range values {
-		if !Checkdatatype(value, NumeberType) {
+		if !Checkdatatype(value, NumberType) {
 			return false
 		}
 	}
 	return true
 }
 
-//CheckString #
+//CheckString checks whether values are string type
 func CheckString(values ...interface{}) bool {
 	for _, value := range values {
 		if !Checkdatatype(value, StringType) {
@@ -57,7 +58,7 @@ func CheckString(values ...interface{}) bool {
 	return true
 }
 
-//CheckBoolean #
+//CheckBoolean checks whether values are boolean type
 func CheckBoolean(values ...interface{}) bool {
 	for _, value := range values {
 		if !Checkdatatype(value, BooleanType) {
@@ -71,11 +72,13 @@ func CheckBoolean(values ...interface{}) bool {
 func GetType(value interface{}) (uint, bool) {
 	switch value.(type) {
 	case decimal.Decimal:
-		return NumeberType, true
+		return NumberType, true
 	case string:
 		return StringType, true
 	case bool:
 		return BooleanType, true
+	case nil:
+		return NoneType, true
 	}
 	return UnSupportedType, false
 }

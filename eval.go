@@ -5,13 +5,13 @@ import (
 	"github.com/5anthosh/chili/evaluator"
 	"github.com/5anthosh/chili/evaluator/datatype"
 	"github.com/5anthosh/chili/parser"
-	"github.com/shopspring/decimal"
 )
 
 //Eval the expression
 func Eval(expression string, data map[string]interface{}) (interface{}, error) {
 	env := environment.New()
 	env.SetDefaultFunctions()
+	env.SetDefaultVariables()
 	putDataToEnv(env, data)
 	_parser := parser.New(expression)
 	ast, err := _parser.Parse()
@@ -26,13 +26,13 @@ func putDataToEnv(env *environment.Environment, data map[string]interface{}) err
 	for k, v := range data {
 		switch v.(type) {
 		case int64:
-			env.DeclareVariable(k, decimal.NewFromInt(v.(int64)))
+			env.SetIntVariable(k, v.(int64))
 		case int32:
-			env.DeclareVariable(k, decimal.NewFromInt32(v.(int32)))
+			env.SetInt32Variable(k, v.(int32))
 		case float64:
-			env.DeclareVariable(k, decimal.NewFromFloat(v.(float64)))
+			env.SetFloatVariable(k, v.(float64))
 		case float32:
-			env.DeclareVariable(k, decimal.NewFromFloat32(v.(float32)))
+			env.SetFloat32Variable(k, v.(float32))
 		case string, bool:
 			env.DeclareVariable(k, v)
 		default:

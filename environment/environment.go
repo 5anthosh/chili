@@ -41,13 +41,49 @@ func (e *Environment) SetFunction(function function.Function) error {
 
 //SetDefaultFunctions to environment
 func (e *Environment) SetDefaultFunctions() error {
-	err := e.SetFunction(function.AbsFunction)
+	funcs := function.DefaultFunctions
+	for _, chiliFunc := range funcs {
+		err := e.SetFunction(chiliFunc)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+//SetDefaultVariables to environment
+func (e *Environment) SetDefaultVariables() error {
+	err := e.SetNumberVariable("PI", function.PI)
+	if err != nil {
+		return err
+	}
+	err = e.SetNumberVariable("E", function.E)
 	return err
 }
 
 //SetNumberVariable in the environment
 func (e *Environment) SetNumberVariable(name string, value decimal.Decimal) error {
 	return e.DeclareVariable(name, value)
+}
+
+//SetFloatVariable  in the environment
+func (e *Environment) SetFloatVariable(name string, value float64) error {
+	return e.SetNumberVariable(name, decimal.NewFromFloat(value))
+}
+
+//SetFloat32Variable in the environment
+func (e *Environment) SetFloat32Variable(name string, value float32) error {
+	return e.SetNumberVariable(name, decimal.NewFromFloat32(value))
+}
+
+//SetIntVariable in the environment
+func (e *Environment) SetIntVariable(name string, value int64) error {
+	return e.SetNumberVariable(name, decimal.NewFromInt(value))
+}
+
+//SetInt32Variable in the environment
+func (e *Environment) SetInt32Variable(name string, value int32) error {
+	return e.SetNumberVariable(name, decimal.NewFromInt32(value))
 }
 
 //DeclareVariable in the environment

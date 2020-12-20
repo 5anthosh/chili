@@ -166,7 +166,7 @@ func (eval *Evaluator) VisitVariableExpr(variableExpr *expr.Variable) (interface
 	if ok {
 		return value, nil
 	}
-	
+
 	return nil, fmt.Errorf("Unknown variable %s", variableExpr.Name)
 }
 
@@ -192,9 +192,9 @@ func (eval *Evaluator) VisitFunctionCall(functionCall *expr.FunctionCall) (inter
 		args = append(args, value)
 	}
 
-	ok = _function.CheckNumberOfArgs(args)
-	if !ok {
-		return nil, fmt.Errorf("function %s() expecting %d but got %d", functionCall.Name, _function.Arity, len(args))
+	err := _function.CheckNumberOfArgs(args)
+	if err != nil {
+		return nil, err
 	}
 
 	ok = _function.CheckTypeOfArgs(args)
@@ -202,9 +202,11 @@ func (eval *Evaluator) VisitFunctionCall(functionCall *expr.FunctionCall) (inter
 		return nil, fmt.Errorf("function %s() got wrong data type params", functionCall.Name)
 	}
 
-	err := _function.VerifyArgs(args)
-	if err != nil {
-		return nil, err
+	if _function.VerifyArgs != nil {
+		err = _function.VerifyArgs(args)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return _function.FunctionImpl(args)

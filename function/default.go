@@ -8,6 +8,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+var one = decimal.NewFromInt(1)
 var three = decimal.NewFromInt(3)
 var two = decimal.NewFromInt(2)
 
@@ -23,8 +24,9 @@ func absImpl(args []interface{}) (interface{}, error) {
 }
 
 func cbrtImpl(args []interface{}) (interface{}, error) {
-	arg := args[0]
-	return arg.(decimal.Decimal).Pow(three), nil
+	arg := args[0].(decimal.Decimal)
+	result, _ := root(arg.BigFloat(), 3).Float64()
+	return decimal.NewFromFloat(result), nil
 }
 
 func ceilImpl(args []interface{}) (interface{}, error) {
@@ -102,7 +104,8 @@ func signImpl(args []interface{}) (interface{}, error) {
 
 func sqrtImpl(args []interface{}) (interface{}, error) {
 	arg := args[0].(decimal.Decimal)
-	return arg.Pow(two), nil
+	result, _ := root(arg.BigFloat(), 2).Float64()
+	return decimal.NewFromFloat(result), nil
 }
 
 func toNumberImpl(args []interface{}) (interface{}, error) {

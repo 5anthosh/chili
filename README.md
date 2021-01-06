@@ -1,4 +1,5 @@
 # 🌶️ chili
+
 > Currently in development, Unstable (API may change in future)
 
 Simple expression evaluation engine.
@@ -7,7 +8,7 @@ Expression is one liner that evalutes into single value
 
 ### Features
 
-- Number accuracy  (using github.com/shopspring/decimal pkg)
+- Number accuracy (using github.com/shopspring/decimal pkg)
 - Extensible
 - Simple grammer
 
@@ -52,24 +53,24 @@ import (
 
 func main() {
     source := "PI*R^2 + abs(45.345)"
-    
+
     env := environment.New()
     env.SetDefaultFunctions()
-    env.SetNumberVariable("PI", decimal.RequireFromString("3.1415926535897932385"))
-    env.SetNumberVariable("R", decimal.RequireFromString("2"))
-    
+    env.SetDefaultVariables()
+    env.SetIntVariable("R", 2)
+
     chiliParser := parser.New(source)
     expression, err := chiliParser.Parse()
     if err != nil {
         panic(err)
     }
-    
+
     chiliEvaluator := evaluator.New(env)
     value, err := chiliEvaluator.Run(expression)
     if err != nil {
         panic(err)
     }
-    
+
     println(fmt.Sprintf("%v result", value))
 }
 ```
@@ -77,4 +78,3 @@ func main() {
 ## License
 
 [MIT](https://github.com/5anthosh/chili/blob/main/LICENSE)
-

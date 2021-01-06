@@ -239,11 +239,11 @@ func isDigit(b byte) bool {
 }
 
 func isChar(b byte) bool {
-	return b >= 'a' && b <= 'z' || b >= 'A' && b <= 'Z'
+	return b >= 'a' && b <= 'z' || b >= 'A' && b <= 'Z' || b == '_'
 }
 
 func (l *Lexer) characters() {
-	for !l.isEnd() && (isChar(l.peek(0)) || isDigit(l.peek(0)) || l.peek(0) == '_' || l.peek(0) == '.') {
+	for !l.isEnd() && (isChar(l.peek(0)) || isDigit(l.peek(0)) || l.peek(0) == '.') {
 		l.eat()
 	}
 }
